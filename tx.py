@@ -1,15 +1,38 @@
 import pigpio
 import queue
+import time
 
 PWM = 18
-
+OUTPUT = 2
 DATA_OUT = 0
 
-# receive from socket.and put into a queue
+FREQ = 4000  # In Kbits/sec
 
+# receive from socket.and put into a queue
+main_queue =  queue.Queue()
+main_queue.put("1010101")
 # once queue is set, send the queue
 
 # start pwm
+
+def make_message(value):
+	bits = []
+	bits.append("1")
+	bits.append(value.split())
+	bits.append("1")
+	return bits
+
+def transmit(value):
+	bits = make_message(value)
+	for bit in bits:
+		if bit == "0":
+			pi.write(OUTPUT, 0)
+		else:
+			pi.write(OUTPUT, 1)
+		time.sleep(1/FREQ)
+	print("Done Transmitting")
+
+
 
 def main():
     try:
@@ -21,7 +44,8 @@ def main():
 
         pi.set_mode(DATA_OUT, pigpio.OUTPUT)
 
-        pi.stop()
+		transmit(value)
+		pi.stop()
 
 
 
