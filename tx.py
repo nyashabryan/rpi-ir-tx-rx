@@ -1,5 +1,5 @@
 import pigpio
-
+import queue
 
 PWM = 18
 
@@ -11,16 +11,25 @@ DATA_OUT = 0
 
 # start pwm
 
-pi = pigpio.pi() #  Make a pigpio object
+def main():
+    try:
+        pi = pigpio.pi() #  Make a pigpio object
 
-pi.set_mode(PWM, pigpio.OUTPUT) #  Set the mode of PWM to output
+        pi.set_mode(PWM, pigpio.OUTPUT) #  Set the mode of PWM to output
 
-pi.hardware_PWM(PWM, 38000, 500000) #  Start the hardware PWM at 38000Hz and 50% duty cycle
+        pi.hardware_PWM(PWM, 38000, 500000) #  Start the hardware PWM at 38000Hz and 50% duty cycle
 
-pi.set_mode(DATA_OUT, pigpio.OUTPUT)
+        pi.set_mode(DATA_OUT, pigpio.OUTPUT)
 
+        pi.stop()
+
+
+
+    except KeyboardInterrupt:
+    pi.stop()
+
+main()
 pi.stop()
-
 """
 #!usr/bin/python
 
