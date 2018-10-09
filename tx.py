@@ -6,7 +6,7 @@ PWM = 18
 OUTPUT = 4
 DATA_OUT = 0
 
-FREQ = 100  # In Kbits/sec
+FREQ = 10  # In Kbits/sec
 
 # receive from socket.and put into a queue
 main_queue =  queue.Queue()
@@ -17,6 +17,8 @@ main_queue.put("101001110110010000")
 
 def make_message(value):
 	bits = []
+	bits.append("1")
+	bits.append("1")
 	bits.append("1")
 	bits.append("1")
 	bits.append("1")

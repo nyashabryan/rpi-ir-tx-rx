@@ -2,7 +2,7 @@ import pigpio
 import time
 
 INPUT = 3
-FREQ = 100
+FREQ = 10
 OUT = []
 
 pi = pigpio.pi()
