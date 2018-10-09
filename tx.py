@@ -6,11 +6,11 @@ PWM = 18
 OUTPUT = 4
 DATA_OUT = 0
 
-FREQ = 4000  # In Kbits/sec
+FREQ = 100  # In Kbits/sec
 
 # receive from socket.and put into a queue
 main_queue =  queue.Queue()
-main_queue.put("1010101")
+main_queue.put("101001110110010000")
 # once queue is set, send the queue
 
 # start pwm
@@ -18,19 +18,27 @@ main_queue.put("1010101")
 def make_message(value):
 	bits = []
 	bits.append("1")
-	bits.append(value.split())
+	bits.append("1")
+	bits.append("1")
+	lst = list(value) 
+	for bit in lst:
+		bits.append(bit)
 	bits.append("1")
 	return bits
 
 
 def transmit(value):
+	global pi
 	bits = make_message(value)
+	print("Starting TX")
+	print(bits)
 	for bit in bits:
 		if bit == "0":
 			pi.write(OUTPUT, 0)
 		else:
 			pi.write(OUTPUT, 1)
 		time.sleep(1/FREQ)
+	pi.write(OUTPUT, 0)
 	print("Done Transmitting")
 
 
@@ -38,6 +46,7 @@ def transmit(value):
 def main():
 	global pi
 	try:
+		time.sleep(10)
 		pi = pigpio.pi() #  Make a pigpio object
 
 		pi.set_mode(PWM, pigpio.OUTPUT) #  Set the mode of PWM to output
@@ -45,8 +54,10 @@ def main():
 		pi.hardware_PWM(PWM, 38000, 500000) #  Start the hardware PWM at 38000Hz and 50% duty cycle
 
 		pi.set_mode(OUTPUT, pigpio.OUTPUT)
-		value = "1010101"
+		value = "101010111110000111"
 		transmit(value)
+		while(True):
+			pass
 		pi.stop()
 
 
