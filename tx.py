@@ -3,7 +3,7 @@ import queue
 import time
 
 PWM = 18
-OUTPUT = 2
+OUTPUT = 4
 DATA_OUT = 0
 
 FREQ = 4000  # In Kbits/sec
@@ -22,6 +22,7 @@ def make_message(value):
 	bits.append("1")
 	return bits
 
+
 def transmit(value):
 	bits = make_message(value)
 	for bit in bits:
@@ -35,22 +36,23 @@ def transmit(value):
 
 
 def main():
-    try:
-        pi = pigpio.pi() #  Make a pigpio object
+	global pi
+	try:
+		pi = pigpio.pi() #  Make a pigpio object
 
-        pi.set_mode(PWM, pigpio.OUTPUT) #  Set the mode of PWM to output
+		pi.set_mode(PWM, pigpio.OUTPUT) #  Set the mode of PWM to output
 
-        pi.hardware_PWM(PWM, 38000, 500000) #  Start the hardware PWM at 38000Hz and 50% duty cycle
+		pi.hardware_PWM(PWM, 38000, 500000) #  Start the hardware PWM at 38000Hz and 50% duty cycle
 
-        pi.set_mode(DATA_OUT, pigpio.OUTPUT)
-
+		pi.set_mode(OUTPUT, pigpio.OUTPUT)
+		value = "1010101"
 		transmit(value)
 		pi.stop()
 
 
 
-    except KeyboardInterrupt:
-    pi.stop()
+	except KeyboardInterrupt:
+		pi.stop()
 
 main()
 pi.stop()
