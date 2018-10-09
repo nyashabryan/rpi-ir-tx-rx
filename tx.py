@@ -19,5 +19,48 @@ pi.hardware_PWM(PWM, 38000, 500000) #  Start the hardware PWM at 38000Hz and 50%
 
 pi.set_mode(DATA_OUT, pigpio.OUTPUT)
 
+pi.stop()
+
+"""
+#!usr/bin/python
+
+#Communicating with Android App
+#Michael Granelli
+#5 September 2018
+
+from socket import *
+import time
+
+HOST = ''
+PORT = 5005
+BUFSIZE = 1024
+ADDR = (HOST,PORT)
+
+serTCPsock = socket(AF_INET, SOCK_STREAM)
+serTCPsock.bind(ADDR)
+serTCPsock.listen(5)
+cont=1
+
+while 1:
+	print 'Waiting to be connected'
+	cliTCPsock,addr =serTCPsock.accept()
+	print 'Connected to:',addr
+	try:
+		while 1:
+			data = ''
+			data = cliTCPsock.recv(BUFSIZE)
+			if not data:
+				break
+			if data!='quit':
+				print data
+			elif data=='quit':
+				serTCPsock.close()
+				exit()
+				break
+	except KeyboardInterrupt:
+		break
+serTCPsock.close()
 
 
+
+"""
