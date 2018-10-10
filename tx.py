@@ -3,7 +3,7 @@ import queue
 import time
 
 PWM = 18
-OUTPUT = 4
+OUTPUT = 14
 DATA_OUT = 0
 
 FREQ = 10  # In Kbits/sec
@@ -28,14 +28,10 @@ def transmit(value):
 	for bit in bits:
 		if bit == 0:
 			pi.write(OUTPUT, 1)
-			time.sleep(0.0001)
-			pi.write(OUTPUT, 0)
-			time.sleep(0.0001)
+			time.sleep(1)
 		else:
-			pi.write(OUTPUT, 1)
-			time.sleep(0.0001)
 			pi.write(OUTPUT, 0)
-			time.sleep(0.0002)
+			time.sleep(1)
 	pi.write(OUTPUT, 1)
 	print("Done Transmitting")
 
@@ -44,7 +40,7 @@ def transmit(value):
 def main():
 	global pi
 	try:
-		time.sleep(10)
+		time.sleep(5)
 		pi = pigpio.pi() #  Make a pigpio object
 
 		pi.set_mode(PWM, pigpio.OUTPUT) #  Set the mode of PWM to output
@@ -53,8 +49,10 @@ def main():
 
 		pi.set_mode(OUTPUT, pigpio.OUTPUT)
 		pi.write(OUTPUT, 0)
+		time.sleep(2)
+		print("Output going HIGH")
 		value = "101010111110000111"
-		transmit(value)
+		#transmit(value)
 		while(True):
 			pass
 		pi.stop()
