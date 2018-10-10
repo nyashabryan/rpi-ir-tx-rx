@@ -73,7 +73,7 @@ def tx(bitstream):
 def encode(value):
 	
 	lst = []
-	value = value[2:-2]
+	value = value[1:-1]
 	value = value.split(",")
 	a = str(bin(ord(value[0]))).split()
 	for ch in a:
