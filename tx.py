@@ -6,7 +6,7 @@ PWM = 18
 OUTPUT = 14
 DATA_OUT = 0
 
-FREQ = 10  # In Kbits/sec
+FREQ = 2900  # In bits/sec
 
 # receive from socket.and put into a queue
 main_queue =  queue.Queue()
@@ -27,12 +27,24 @@ def transmit(value):
 	print(bits)
 	for bit in bits:
 		if bit == 0:
+			tick = time.monotonic()
 			pi.write(OUTPUT, 1)
-			time.sleep(1)
-		else:
+			while(time.monotonic()-tick < 1/FREQ):
+				pass
+			tick = time.monotonic()
 			pi.write(OUTPUT, 0)
-			time.sleep(1)
-	pi.write(OUTPUT, 1)
+			while(time.monotonic()-tick < 1/FREQ * 2):
+				pass
+		else:
+			tick = time.monotonic()
+			pi.write(OUTPUT, 1)
+			while(time.monotonic() - tick < 1/FREQ):
+				pass
+			tick = time.monotonic()
+			pi.write(OUTPUT, 0)
+			while(time.monotonic() - tick < 1/FREQ):
+				pass
+	pi.write(OUTPUT, 0)
 	print("Done Transmitting")
 
 
@@ -48,11 +60,9 @@ def main():
 		pi.hardware_PWM(PWM, 38000, 500000) #  Start the hardware PWM at 38000Hz and 50% duty cycle
 
 		pi.set_mode(OUTPUT, pigpio.OUTPUT)
-		pi.write(OUTPUT, 0)
 		time.sleep(2)
-		print("Output going HIGH")
 		value = "101010111110000111"
-		#transmit(value)
+		transmit(value)
 		while(True):
 			pass
 		pi.stop()
