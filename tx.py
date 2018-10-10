@@ -70,9 +70,27 @@ def tx(bitstream):
 	pi.write(OUTPUT, 0)
 	print("Done Transmitting")
 
+def encode(value):
+	
+	lst = []
+	value = value[2:-2]
+	value = value.split(",")
+	a = str(bin(ord(value[0]))).split()
+	for ch in a:
+		lst.append(eval(ch))
+	b = str(bin(eval(value[1])))
+	for ch in b:
+		lst.append(eval(ch))
+	c = str(bin(eval(value[2])))
+	for ch in c:
+		lst.append(eval(ch))
+	
+	return lst
+
 
 def transmit(value):
-	bitstream = make_message(value)
+	bitstream = encode(value)
+	bitstream = make_message(bitstream)
 	print("Starting TX")
 	print(bitstream)
 	tx(bitstream)

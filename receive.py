@@ -32,6 +32,46 @@ def get_values(gpio, level, tick):
 			print(ZERO_T)
 	LAST_TICK = tick
 
+class Note:
+
+	def __init__(self, note, volume, duration):
+		self.note = note
+		self.volume = volume
+		self.duration = duration
+
+
+def decode(bitstream):
+	note = chr(int(
+		str(bitstream[2]),
+		str(bitstream[3]),
+		str(bitstream[4]),
+		str(bitstream[5]),
+		str(bitstream[6]),
+		str(bitstream[7]),
+		str(bitstream[8]),
+		str(bitstream[9]), 2
+		))
+	volume = chr(int(
+		str(bitstream[10])+
+		str(bitstream[11])+
+		str(bitstream[12])+
+		str(bitstream[13])+
+		str(bitstream[14])+
+		str(bitstream[15])+
+		str(bitstream[16])+
+		str(bitstream[17]), 2
+	))
+	duration = int(
+		str(bitstream[18])+
+		str(bitstream[19])+
+		str(bitstream[20])+
+		str(bitstream[21])+
+		str(bitstream[22])+
+		str(bitstream[23])+
+		str(bitstream[24])+
+		str(bitstream[25]), 2
+	)
+	return Note(note, volume, duration)
 
 def parity_check(bitstream):
 	count = 0
@@ -48,7 +88,7 @@ def process(bitstream):
 		print("Tail corrupt. Data discarded.")
 	if parity_check(bitstream):
 		LAST_DATA = bitstream
-		return bitstream
+		return decode(bitstream)
 	else:
 		print("Data corrupt.")
 	return LAST_DATA
