@@ -125,8 +125,8 @@ def WIFI_RX():
 
 def main():
 	threads = [
-		threading.Thread(target=IR_TX, args=(MAIN_QUEUE)),
-		threading.Thread(target=WIFI_RX, args=(MAIN_QUEUE))
+		threading.Thread(target=IR_TX, args=(MAIN_QUEUE,)),
+		threading.Thread(target=WIFI_RX, args=(MAIN_QUEUE,))
 	]
 	for thread in threads:
 		thread.start()
