@@ -16,20 +16,7 @@ main_queue.put("101001110110010000")
 # start pwm
 
 def make_message(value):
-<<<<<<< HEAD
 	bits = [0,1,1,0,1,0,0,1,1,1,0,1,1,0,0,1,0,0,0,0,1,0,1,0,1,0,1,0]
-=======
-	bits = []
-	bits.append("1")
-	bits.append("1")
-	bits.append("1")
-	bits.append("1")
-	bits.append("1")
-	lst = list(value) 
-	for bit in lst:
-		bits.append(bit)
-	bits.append("1")
->>>>>>> c204326f9eb16031b2c5a1d741e65c1a34b47997
 	return bits
 
 
