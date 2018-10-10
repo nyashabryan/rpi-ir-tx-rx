@@ -16,14 +16,7 @@ main_queue.put("101001110110010000")
 # start pwm
 
 def make_message(value):
-	bits = []
-	bits.append("1")
-	bits.append("1")
-	bits.append("1")
-	lst = list(value) 
-	for bit in lst:
-		bits.append(bit)
-	bits.append("1")
+	bits = [0,1,1,0,1,0,0,1,1,1,0,1,1,0,0,1,0,0,0,0,1,0,1,0,1,0,1,0]
 	return bits
 
 
@@ -33,12 +26,17 @@ def transmit(value):
 	print("Starting TX")
 	print(bits)
 	for bit in bits:
-		if bit == "0":
+		if bit == 0:
+			pi.write(OUTPUT, 1)
+			time.sleep(0.0001)
 			pi.write(OUTPUT, 0)
+			time.sleep(0.0001)
 		else:
 			pi.write(OUTPUT, 1)
-		time.sleep(1/FREQ)
-	pi.write(OUTPUT, 0)
+			time.sleep(0.0001)
+			pi.write(OUTPUT, 0)
+			time.sleep(0.0002)
+	pi.write(OUTPUT, 1)
 	print("Done Transmitting")
 
 
@@ -54,6 +52,7 @@ def main():
 		pi.hardware_PWM(PWM, 38000, 500000) #  Start the hardware PWM at 38000Hz and 50% duty cycle
 
 		pi.set_mode(OUTPUT, pigpio.OUTPUT)
+		pi.write(OUTPUT, 0)
 		value = "101010111110000111"
 		transmit(value)
 		while(True):
