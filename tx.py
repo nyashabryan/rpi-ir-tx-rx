@@ -96,7 +96,7 @@ def transmit(value):
 	tx(bitstream)
 
 
-def IR_TX():
+def IR_TX(MAIN_QUEUE):
 	global pi
 	try:
 		time.sleep(5)
@@ -119,7 +119,7 @@ def IR_TX():
 		exit()
 
 
-def WIFI_RX():
+def WIFI_RX(MAIN_QUEUE):
 	try:
 		serTCPsock.bind(ADDR)
 		serTCPsock.listen(5)
@@ -144,7 +144,7 @@ def WIFI_RX():
 def main():
 	threads = [
 		threading.Thread(target=IR_TX, args=(MAIN_QUEUE,)),
-		threading.Thread(target=WIFI_RX, args=(MAIN_QUEUE,))
+		threading.Thread(target=WIFI_RX, args=(MAIN_QUEUE,)),
 	]
 	for thread in threads:
 		thread.start()
