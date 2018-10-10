@@ -15,8 +15,23 @@ main_queue.put("101001110110010000")
 
 # start pwm
 
-def make_message(value):
-	bits = [0,1,1,0,1,0,0,1,1,1,0,1,1,0,0,1,0,0,0,0,1,0,1,0,1,0,1,0]
+def calculate_parity(HEADER, TAIL, bitstream):
+	"""
+		Calculates the value of the even parity
+	"""
+	all_bits = HEADER + bitstream + TAIL
+	count = 0
+	for bit in all_bits:
+		if bit == 1:
+			count = count + 1
+	return count % 2
+
+
+def make_message(bitstream):
+	HEADER = [0, 1]
+	TAIL = [0, 1]
+	bitstream = [0,1,1,0,1,0,0,1,1,1,0,1,1,0,0,1,0,0,0,0,1,0,1,0,1,0,1,0]
+	parity = calculate_parity(HEADER, TAIL, bits)
 	return bits
 
 
