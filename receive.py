@@ -125,7 +125,9 @@ def PX():
 	global RX_QUEUE, PX_QUEUE
 	while (True):
 		bitstream = RX_QUEUE.get(block=True)
-		PX_QUEUE.put(process(bitstream))
+		note = process(bitstream)
+		print(note)
+		PX_QUEUE.put(note)
 
 def play():
 	print("Player Ready")
