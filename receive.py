@@ -137,15 +137,15 @@ def play():
 		note = a_note.note
 		volume = str((a_note.volume/255)*16383)
 		duration = "t"
-		if a_note.duration==50:
+		if  40<a_note.duration <60:
 			duration = "t"
-		elif a_note.duration==100:
+		elif 90<a_note.duration<110:
 			duration ="s"
-		elif a_note.duration==150:
+		elif 140<a_note.duration<160:
 			duration ="i"
-		elif a_note.duration==200:
+		elif 190<a_note.duration<210:
 			duration ="q"
-		elif a_note.duration==250:
+		elif 240<a_note.duration<260:
 			duration ="h"
 		subprocess.call(["java","-cp","jfugue.jar:.","test", note, duration, volume])
 
