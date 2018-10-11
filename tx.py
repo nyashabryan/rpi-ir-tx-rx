@@ -23,7 +23,6 @@ pi = pigpio.pi()
 
 # receive from socket.and put into a queue
 MAIN_QUEUE =  queue.Queue()
-MAIN_QUEUE.put("b'(A, 154, 154)'")
 # once queue is set, send the queue
 
 # start pwm
@@ -129,9 +128,9 @@ def WIFI_RX(MAIN_QUEUE):
 	try:
 		serTCPsock.bind(ADDR)
 		serTCPsock.listen(5)
+		print("WiFi RX set up")
 		while 1:
 			cliTCPsock,addr = serTCPsock.accept()
-			print
 			while True:
 				data = ''
 				data = cliTCPsock.recv(11)
@@ -153,8 +152,8 @@ def main():
 		threading.Thread(target=IR_TX, args=(MAIN_QUEUE,)),
 		threading.Thread(target=WIFI_RX, args=(MAIN_QUEUE,)),
 	]
-	threads[0].run()
 	threads[1].start()
+	threads[0].run()
 
 if __name__ == "__main__":
 	main()

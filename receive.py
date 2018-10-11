@@ -24,7 +24,6 @@ def get_values(gpio, level, tick):
 		TRANSMITTING = True
 	else:
 		if DATA:
-			print(pigpio.tickDiff(LAST_TICK, tick), "TICK")
 			if pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 0.8:
 				BIT_QUEUE.put(1)
 			else:
@@ -88,7 +87,7 @@ def parity_check(bitstream):
 
 def process(bitstream):
 	global LAST_DATA
-	if bitstream[0] != 1:
+	if bitstream[0] != 0 or bitstream[1] != 1:
 		print("Header corrupt. Data discarded.")
 	if bitstream[27] != 0 or bitstream[28] != 1:
 		print("Tail corrupt. Data discarded.")
