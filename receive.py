@@ -86,6 +86,7 @@ def parity_check(bitstream):
 
 
 def process(bitstream):
+	return decode(bitstream)
 	global LAST_DATA
 	if bitstream[0] != 0 or bitstream[1] != 1:
 		print("Header corrupt. Data discarded.")
