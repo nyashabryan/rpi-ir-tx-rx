@@ -99,8 +99,8 @@ def process(bitstream):
 		print("Data corrupt.")
 	return LAST_DATA
 
-def IR_RX(BIT_QUEUE, RX_QUEUE):
-	global OUT, DATA, TRANSMITTING, pi
+def IR_RX():
+	global OUT, DATA, TRANSMITTING, pi, RX_QUEUE, BIT_QUEUE
 	try:
 		pi.set_mode(INPUT, pigpio.INPUT)
 		pi.set_pull_up_down(INPUT, pigpio.PUD_UP)
@@ -111,7 +111,8 @@ def IR_RX(BIT_QUEUE, RX_QUEUE):
 			while(len(OUT) < 28):
 				OUT.append(BIT_QUEUE.get(block=True))
 			TRANSMITTING = False
-			RX_QUEUE.put(OUT)
+			DATA = False
+			RX_QUEUE.put(OUT + [1])
 			OUT = [0]
 		pi.stop()
 	except KeyboardInterrupt:
@@ -119,12 +120,12 @@ def IR_RX(BIT_QUEUE, RX_QUEUE):
 			print(RX_QUEUE.get())
 		pi.stop()
 
-def PX(RX_QUEUE, PX_QUEUE):
+def PX():
+	global RX_QUEUE
 	while (True):
-		if(not RX_QUEUE.empty()):
-			bitstream = RX_QUEUE.get()
-			print("Received", bitstream)
-			#PX_QUEUE.put(process(bitstream))
+		bitstream = RX_QUEUE.get(block=True)
+		print("Received", bitstream)
+		#PX_QUEUE.put(process(bitstream))
 
 
 def printing(RX_QUEUE, PX_QUEUE):
@@ -138,8 +139,8 @@ if __name__ == "__main__":
 	
 	try:
 		threads = [
-			threading.Thread(target=IR_RX, args=(BIT_QUEUE, RX_QUEUE,)),
-			threading.Thread(target=PX, args=(RX_QUEUE, PX_QUEUE)),
+			threading.Thread(target=IR_RX),
+			threading.Thread(target=PX),
 			threading.Thread(target=printing, args=(RX_QUEUE, PX_QUEUE)),
 		]
 		threads[0].run()
