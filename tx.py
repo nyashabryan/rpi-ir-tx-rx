@@ -115,7 +115,7 @@ def IR_TX(MAIN_QUEUE):
 		while(True):
 			if MAIN_QUEUE.not_empty:
 				transmit(MAIN_QUEUE.get())
-				time.sleep(0.1)
+				time.sleep(0.3)
 			
 		pi.stop()
 	except KeyboardInterrupt:
