@@ -138,7 +138,7 @@ if __name__ == "__main__":
 	
 	try:
 		threads = [
-			threading.Thread(target=IR_RX, args=(BIT_QUEUE,)),
+			threading.Thread(target=IR_RX, args=(BIT_QUEUE, RX_QUEUE,)),
 			threading.Thread(target=PX, args=(RX_QUEUE, PX_QUEUE)),
 			threading.Thread(target=printing, args=(RX_QUEUE, PX_QUEUE)),
 		]
