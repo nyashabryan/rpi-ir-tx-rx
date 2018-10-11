@@ -1,13 +1,15 @@
 import pigpio
 import time
 import queue
+import threading
 
 INPUT = 3
 FREQ = 10
 OUT = []
 
 pi = pigpio.pi()
-MAIN_QUEUE = queue.Queue()
+RX_QUEUE = queue.Queue()
+PX_QUEUE = queue.Queue()
 LAST_DATA = 0
 
 TRANSMITTING = False
@@ -94,24 +96,48 @@ def process(bitstream):
 		print("Data corrupt.")
 	return LAST_DATA
 
-try:
-	pi.set_mode(INPUT, pigpio.INPUT)
-	pi.set_pull_up_down(INPUT, pigpio.PUD_UP)
-	c1 = pi.callback(INPUT, pigpio.FALLING_EDGE, get_values)
-	while(True):
-		if(len(OUT) < 29):
-			pass
-		else:
-			c1.cancel()
-			print("Receiving", OUT)
-			#MAIN_QUEUE.join(process(OUT))
-			TRANSMITTING = False
-			DATA = False
-			c1 = pi.callback(INPUT, pigpio.FALLING_EDGE, get_values)
-			OUT = []
-	pi.stop()
-except KeyboardInterrupt:
-	while (not MAIN_QUEUE.empty()):
-		print(MAIN_QUEUE.get())
-	pi.stop()
-exit()
+def IR_RX(RX_QUEUE, PX_QUEUE):
+	global OUT, DATA, TRANSMITTING
+	try:
+		pi.set_mode(INPUT, pigpio.INPUT)
+		pi.set_pull_up_down(INPUT, pigpio.PUD_UP)
+		c1 = pi.callback(INPUT, pigpio.FALLING_EDGE, get_values)
+		while(True):
+			if(len(OUT) < 28):
+				pass
+			else:
+				c1.cancel()
+				print("Receiving", OUT)
+				TRANSMITTING = False
+				DATA = False
+				RX_QUEUE.put(OUT)
+				c1 = pi.callback(INPUT, pigpio.FALLING_EDGE, get_values)
+				OUT = []
+		pi.stop()
+	except KeyboardInterrupt:
+		while (not RX_QUEUE.empty()):
+			print(RX_QUEUE.get())
+		pi.stop()
+
+
+def PX(RX_QUEUE, PX_QUEUE):
+	while (True):
+		if(not RX_QUEUE.empty()):
+			bitstream = RX_QUEUE.get()
+			PX_QUEUE.put(process(bitstream))
+
+
+
+
+
+if __name__ == "__main__":
+	
+	try:
+		threads = [
+			threading.Thread(target=IR_RX, args=(RX_QUEUE, PX_QUEUE)),
+			threading.Thread(target=PX, args=(RX_QUEUE, PX_QUEUE)),
+		]
+
+	except KeyboardInterrupt:
+		print("Quiting")
+		exit()
