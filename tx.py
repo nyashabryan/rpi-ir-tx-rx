@@ -23,7 +23,6 @@ pi = pigpio.pi()
 
 # receive from socket.and put into a queue
 MAIN_QUEUE =  queue.Queue()
-MAIN_QUEUE.put("101001110110010000")
 # once queue is set, send the queue
 
 # start pwm
@@ -42,9 +41,10 @@ def calculate_parity(HEADER, TAIL, bitstream):
 def make_message(bitstream):
 	HEADER = [0, 1]
 	TAIL = [0, 1]
-	bitstream = [0,1,1,0,1,0,0,1,1,1,0,1,1,0,0,1,0,0,0,0,1,0,1,0,1,0,1,0]
+	bitstream = bitstream
 	parity = calculate_parity(HEADER, TAIL, bitstream)
-	return HEADER + bitstream.append(parity) + TAIL
+	bitstream.append(parity)
+	return HEADER + bitstream + TAIL
 
 
 def tx(bitstream):
@@ -68,31 +68,34 @@ def tx(bitstream):
 			while(time.monotonic() - tick < 1/FREQ):
 				pass
 	pi.write(OUTPUT, 0)
-	print("Done Transmitting")
 
 def encode(value):
-	
 	lst = []
-	value = value[1:-1]
+	value = value[3:-2]
 	value = value.split(",")
-	a = str(bin(ord(value[0]))).split()
+	a = str(bin(ord(value[0])))
+	a = "0"+ a[2:]
 	for ch in a:
 		lst.append(eval(ch))
 	b = str(bin(eval(value[1])))
+	b = b[2:]
+	while len(b) < 8:
+		b = "0" + b
 	for ch in b:
 		lst.append(eval(ch))
 	c = str(bin(eval(value[2])))
+	c = c[2:]
+	while len(c) < 8:
+		c = "0" + c
 	for ch in c:
 		lst.append(eval(ch))
-	
 	return lst
 
 
 def transmit(value):
 	bitstream = encode(value)
 	bitstream = make_message(bitstream)
-	print("Starting TX")
-	print(bitstream)
+	print("Sending", bitstream)
 	tx(bitstream)
 
 
@@ -112,6 +115,7 @@ def IR_TX(MAIN_QUEUE):
 		while(True):
 			if MAIN_QUEUE.not_empty:
 				transmit(MAIN_QUEUE.get())
+				time.sleep(0.1)
 			
 		pi.stop()
 	except KeyboardInterrupt:
@@ -127,11 +131,11 @@ def WIFI_RX(MAIN_QUEUE):
 		print("WIFI set up at ", addr)
 		while(True):
 			data = ''
-			data = cliTCPsock.recv(BUFSIZE)
+			data = cliTCPsock.recv(11)
 			if not data:
 				continue
 			elif data != 'quit':
-				MAIN_QUEUE.put(data)
+				MAIN_QUEUE.put(str(data))
 			elif data=='quit':
 				serTCPsock.close()
 				exit()

@@ -21,7 +21,6 @@ def get_values(gpio, level, tick):
 		TRANSMITTING = True
 	else:
 		if DATA:
-			print(pigpio.tickDiff(LAST_TICK, tick))
 			if pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 0.8:
 				OUT.append(1)
 			else:
@@ -29,7 +28,6 @@ def get_values(gpio, level, tick):
 		if not DATA:
 			ZERO_T = pigpio.tickDiff(LAST_TICK, tick)
 			DATA = True
-			print(ZERO_T)
 	LAST_TICK = tick
 
 class Note:
@@ -38,20 +36,22 @@ class Note:
 		self.note = note
 		self.volume = volume
 		self.duration = duration
+	def __str__(self):
+		return str(self.note) + " " + str(self.volume) + " " + str(self.duration)
 
 
 def decode(bitstream):
 	note = chr(int(
-		str(bitstream[2]),
-		str(bitstream[3]),
-		str(bitstream[4]),
-		str(bitstream[5]),
-		str(bitstream[6]),
-		str(bitstream[7]),
-		str(bitstream[8]),
+		str(bitstream[2])+
+		str(bitstream[3])+
+		str(bitstream[4])+
+		str(bitstream[5])+
+		str(bitstream[6])+
+		str(bitstream[7])+
+		str(bitstream[8])+
 		str(bitstream[9]), 2
 		))
-	volume = chr(int(
+	volume = int(
 		str(bitstream[10])+
 		str(bitstream[11])+
 		str(bitstream[12])+
@@ -60,7 +60,7 @@ def decode(bitstream):
 		str(bitstream[15])+
 		str(bitstream[16])+
 		str(bitstream[17]), 2
-	))
+	)
 	duration = int(
 		str(bitstream[18])+
 		str(bitstream[19])+
@@ -82,6 +82,7 @@ def parity_check(bitstream):
 
 
 def process(bitstream):
+	global LAST_DATA
 	if bitstream[0] != 0 or bitstream[1] != 1:
 		print("Header corrupt. Data discarded.")
 	if bitstream[27] != 0 or bitstream[28] != 1:
@@ -102,11 +103,15 @@ try:
 			pass
 		else:
 			c1.cancel()
-			MAIN_QUEUE.join(process(OUT))
+			print("Receiving", OUT)
+			#MAIN_QUEUE.join(process(OUT))
 			TRANSMITTING = False
 			DATA = False
 			c1 = pi.callback(INPUT, pigpio.FALLING_EDGE, get_values)
+			OUT = []
 	pi.stop()
 except KeyboardInterrupt:
+	while (not MAIN_QUEUE.empty()):
+		print(MAIN_QUEUE.get())
 	pi.stop()
 exit()
