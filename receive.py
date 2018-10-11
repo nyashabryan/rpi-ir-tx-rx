@@ -23,7 +23,7 @@ def get_values(gpio, level, tick):
 		TRANSMITTING = True
 	else:
 		if DATA:
-			if pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 0.8:
+			if pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 0.73:
 				OUT.append(1)
 			else:
 				OUT.append(0)
@@ -85,7 +85,7 @@ def parity_check(bitstream):
 
 def process(bitstream):
 	global LAST_DATA
-	if bitstream[0] != 0 or bitstream[1] != 1:
+	if bitstream[0] != 1:
 		print("Header corrupt. Data discarded.")
 	if bitstream[27] != 0 or bitstream[28] != 1:
 		print("Tail corrupt. Data discarded.")
@@ -103,7 +103,7 @@ def IR_RX(RX_QUEUE, PX_QUEUE):
 		pi.set_pull_up_down(INPUT, pigpio.PUD_UP)
 		c1 = pi.callback(INPUT, pigpio.FALLING_EDGE, get_values)
 		while(True):
-			if(len(OUT) < 28):
+			if(len(OUT) < 29):
 				pass
 			else:
 				c1.cancel()
@@ -124,13 +124,14 @@ def PX(RX_QUEUE, PX_QUEUE):
 	while (True):
 		if(not RX_QUEUE.empty()):
 			bitstream = RX_QUEUE.get()
-			PX_QUEUE.put(process(bitstream))
+			#PX_QUEUE.put(process(bitstream))
 
 
 def printing(RX_QUEUE, PX_QUEUE):
 	while(True):
 		if (not RX_QUEUE.empty()):
-			print("Received", RX_QUEUE.get())
+			#print("Received", RX_QUEUE.get())
+			pass
 
 
 if __name__ == "__main__":
@@ -141,7 +142,9 @@ if __name__ == "__main__":
 			threading.Thread(target=PX, args=(RX_QUEUE, PX_QUEUE)),
 			threading.Thread(target=printing, args=(RX_QUEUE, PX_QUEUE)),
 		]
-
+		for thread in threads:
+			thread.start()
+		
 	except KeyboardInterrupt:
 		print("Quiting")
 		exit()

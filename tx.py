@@ -10,7 +10,7 @@ PWM = 18
 OUTPUT = 14
 DATA_OUT = 0
 
-FREQ = 2900  # In bits/sec
+FREQ = 1500  # In bits/sec
 
 serTCPsock = socket(AF_INET, SOCK_STREAM)
 HOST = ''
