@@ -114,7 +114,7 @@ def IR_RX(BIT_QUEUE):
 def RX_BITS(BIT_QUEUE, RX_QUEUE):
 	OUT = [0]
 	while True:
-		while len(OUT) < 30:
+		while(len(OUT) < 29):
 			OUT.append(BIT_QUEUE.get())
 		RX_QUEUE.put(OUT)
 		OUT = []
@@ -123,6 +123,7 @@ def PX(RX_QUEUE, PX_QUEUE):
 	while (True):
 		if(not RX_QUEUE.empty()):
 			bitstream = RX_QUEUE.get()
+			print("Received", bitstream)
 			#PX_QUEUE.put(process(bitstream))
 
 

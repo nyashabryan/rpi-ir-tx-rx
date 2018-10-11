@@ -126,14 +126,14 @@ def WIFI_RX(MAIN_QUEUE):
 	try:
 		serTCPsock.bind(ADDR)
 		serTCPsock.listen(5)
-		cliTCPsock,addr =serTCPsock.accept()
 		print("WIFI set up at ", addr)
 		while(True):
+			cliTCPsock,addr = serTCPsock.accept()
 			data = ''
 			data = cliTCPsock.recv(11)
 			if not data:
 				continue
-			elif data != 'quit':
+			elif data != 'quit' and data != '':
 				MAIN_QUEUE.put(str(data))
 			elif data=='quit':
 				serTCPsock.close()
