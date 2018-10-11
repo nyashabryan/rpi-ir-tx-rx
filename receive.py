@@ -24,12 +24,14 @@ def get_values(gpio, level, tick):
 		TRANSMITTING = True
 	else:
 		if DATA:
-			if pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 0.73:
+			print(pigpio.tickDiff(LAST_TICK, tick), "TICK")
+			if ZERO_T * 0.34 < pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 0.68:
 				BIT_QUEUE.put(1)
-			else:
+			elif ZERO_T * 0.7 < pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 1.3:
 				BIT_QUEUE.put(0)
 		if not DATA:
 			ZERO_T = pigpio.tickDiff(LAST_TICK, tick)
+			print(ZERO_T, "ZERO T")
 			DATA = True
 	LAST_TICK = tick
 

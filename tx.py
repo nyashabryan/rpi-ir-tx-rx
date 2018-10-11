@@ -10,7 +10,7 @@ PWM = 18
 OUTPUT = 14
 DATA_OUT = 0
 
-FREQ = 1500  # In bits/sec
+FREQ = 100  # In bits/sec
 
 serTCPsock = socket(AF_INET, SOCK_STREAM)
 HOST = ''
@@ -52,7 +52,7 @@ def tx(bitstream):
 		if bit == 0:
 			tick = time.monotonic()
 			pi.write(OUTPUT, 1)
-			while(time.monotonic()-tick < 1/FREQ):
+			while(time.monotonic()-tick < 1/FREQ * 2):
 				pass
 			tick = time.monotonic()
 			pi.write(OUTPUT, 0)
@@ -114,7 +114,7 @@ def IR_TX(MAIN_QUEUE):
 		while(True):
 			if MAIN_QUEUE.not_empty:
 				transmit(MAIN_QUEUE.get())
-				time.sleep(0.3)
+				time.sleep(0.5)
 			
 		pi.stop()
 	except KeyboardInterrupt:
@@ -126,18 +126,19 @@ def WIFI_RX(MAIN_QUEUE):
 	try:
 		serTCPsock.bind(ADDR)
 		serTCPsock.listen(5)
-		print("WIFI set up at ", addr)
-		while(True):
+		while 1:
 			cliTCPsock,addr = serTCPsock.accept()
-			data = ''
-			data = cliTCPsock.recv(11)
-			if not data:
-				continue
-			elif data != 'quit' and data != '':
-				MAIN_QUEUE.put(str(data))
-			elif data=='quit':
-				serTCPsock.close()
-				exit()
+			print
+			while True:
+				data = ''
+				data = cliTCPsock.recv(11)
+				if not data:
+					break
+				elif data != 'quit' and data != '':
+					MAIN_QUEUE.put(str(data))
+				elif data=='quit':
+					serTCPsock.close()
+					exit()
 
 	except KeyboardInterrupt:
 		serTCPsock.close()
