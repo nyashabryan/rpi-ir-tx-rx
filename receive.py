@@ -124,15 +124,7 @@ def PX():
 	global RX_QUEUE
 	while (True):
 		bitstream = RX_QUEUE.get(block=True)
-		print("Received", bitstream)
-		#PX_QUEUE.put(process(bitstream))
-
-
-def printing(RX_QUEUE, PX_QUEUE):
-	while(True):
-		if (not RX_QUEUE.empty()):
-			#print("Received", RX_QUEUE.get())
-			pass
+		print("Received", process(bitstream))
 
 
 if __name__ == "__main__":
@@ -141,10 +133,9 @@ if __name__ == "__main__":
 		threads = [
 			threading.Thread(target=IR_RX),
 			threading.Thread(target=PX),
-			threading.Thread(target=printing, args=(RX_QUEUE, PX_QUEUE)),
 		]
-		threads[0].run()
 		threads[1].start()
+		threads[0].run()
 		
 	except KeyboardInterrupt:
 		print("Quiting")
