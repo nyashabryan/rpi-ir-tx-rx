@@ -108,7 +108,7 @@ def IR_RX(BIT_QUEUE, RX_QUEUE):
 		c1 = pi.callback(INPUT, pigpio.FALLING_EDGE, get_values)
 		while(True):
 			OUT = [0]
-			while(len(OUT) < 29):
+			while(len(OUT) < 28):
 				OUT.append(BIT_QUEUE.get(block=True))
 			TRANSMITTING = False
 			RX_QUEUE.put(OUT)
