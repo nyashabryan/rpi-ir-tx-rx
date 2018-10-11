@@ -2,6 +2,7 @@ import pigpio
 import time
 import queue
 import threading
+import subprocess
 
 INPUT = 3
 FREQ = 10
@@ -121,11 +122,29 @@ def IR_RX():
 		pi.stop()
 
 def PX():
-	global RX_QUEUE
+	global RX_QUEUE, PX_QUEUE
 	while (True):
 		bitstream = RX_QUEUE.get(block=True)
-		print("Received", process(bitstream))
+		PX_QUEUE.put(process(bitstream))
 
+def play():
+	print("Player Ready")
+	global PX_QUEUE
+	while True:
+		a_note = PX_QUEUE.get(block=True)
+		note = a_note.note
+		volume = str((a_note.volume/255)*16383)
+		if a_note.duration==50:
+			duration = "t"
+		elif a_note.duration==100:
+			duration ="s"
+		elif a_note.duration==150:
+			duration ="i"
+		elif a_note.duration==200:
+			duration ="q"
+		elif a_note.duration==250:
+			duration ="h"
+		subprocess.call(["java","-cp","jfugue.jar:.","test", note, duration, volume])
 
 if __name__ == "__main__":
 	
@@ -133,8 +152,10 @@ if __name__ == "__main__":
 		threads = [
 			threading.Thread(target=IR_RX),
 			threading.Thread(target=PX),
+			threading.Thread(target=play),
 		]
 		threads[1].start()
+		threads[2].start()
 		threads[0].run()
 		
 	except KeyboardInterrupt:
