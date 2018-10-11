@@ -100,7 +100,7 @@ def process(bitstream):
 	return LAST_DATA
 
 def IR_RX(BIT_QUEUE, RX_QUEUE):
-	global OUT, DATA, TRANSMITTING, pi, BIT_QUEUE, RX_QUEUE
+	global OUT, DATA, TRANSMITTING, pi
 	try:
 		pi.set_mode(INPUT, pigpio.INPUT)
 		pi.set_pull_up_down(INPUT, pigpio.PUD_UP)
