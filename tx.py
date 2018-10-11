@@ -10,7 +10,7 @@ PWM = 18
 OUTPUT = 14
 DATA_OUT = 0
 
-FREQ = 100  # In bits/sec
+FREQ = 2900  # In bits/sec
 
 serTCPsock = socket(AF_INET, SOCK_STREAM)
 HOST = ''
@@ -23,6 +23,7 @@ pi = pigpio.pi()
 
 # receive from socket.and put into a queue
 MAIN_QUEUE =  queue.Queue()
+MAIN_QUEUE.put("b'(A, 154, 154)'")
 # once queue is set, send the queue
 
 # start pwm
@@ -48,11 +49,12 @@ def make_message(bitstream):
 
 
 def tx(bitstream):
+	global pi
 	for bit in bitstream:
 		if bit == 0:
 			tick = time.monotonic()
 			pi.write(OUTPUT, 1)
-			while(time.monotonic()-tick < 1/FREQ * 2):
+			while(time.monotonic()-tick < 1/FREQ ):
 				pass
 			tick = time.monotonic()
 			pi.write(OUTPUT, 0)
@@ -67,6 +69,7 @@ def tx(bitstream):
 			pi.write(OUTPUT, 0)
 			while(time.monotonic() - tick < 1/FREQ):
 				pass
+	pi.write(OUTPUT, 0)
 
 def encode(value):
 	lst = []
@@ -150,8 +153,8 @@ def main():
 		threading.Thread(target=IR_TX, args=(MAIN_QUEUE,)),
 		threading.Thread(target=WIFI_RX, args=(MAIN_QUEUE,)),
 	]
-	for thread in threads:
-		thread.start()
+	threads[0].run()
+	threads[1].start()
 
 if __name__ == "__main__":
 	main()

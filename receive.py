@@ -25,9 +25,9 @@ def get_values(gpio, level, tick):
 	else:
 		if DATA:
 			print(pigpio.tickDiff(LAST_TICK, tick), "TICK")
-			if ZERO_T * 0.34 < pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 0.68:
+			if pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 0.8:
 				BIT_QUEUE.put(1)
-			elif ZERO_T * 0.7 < pigpio.tickDiff(LAST_TICK, tick) < ZERO_T * 1.3:
+			else:
 				BIT_QUEUE.put(0)
 		if not DATA:
 			ZERO_T = pigpio.tickDiff(LAST_TICK, tick)
@@ -99,27 +99,25 @@ def process(bitstream):
 		print("Data corrupt.")
 	return LAST_DATA
 
-def IR_RX(BIT_QUEUE):
-	global OUT, DATA, TRANSMITTING
+def IR_RX(BIT_QUEUE, RX_QUEUE):
+	global OUT, DATA, TRANSMITTING, pi, BIT_QUEUE, RX_QUEUE
 	try:
 		pi.set_mode(INPUT, pigpio.INPUT)
 		pi.set_pull_up_down(INPUT, pigpio.PUD_UP)
+		print("Ready to Receive")
 		c1 = pi.callback(INPUT, pigpio.FALLING_EDGE, get_values)
 		while(True):
-			pass
+			OUT = [0]
+			while(len(OUT) < 29):
+				OUT.append(BIT_QUEUE.get(block=True))
+			TRANSMITTING = False
+			RX_QUEUE.put(OUT)
+			OUT = [0]
 		pi.stop()
 	except KeyboardInterrupt:
 		while (not RX_QUEUE.empty()):
 			print(RX_QUEUE.get())
 		pi.stop()
-
-def RX_BITS(BIT_QUEUE, RX_QUEUE):
-	OUT = [0]
-	while True:
-		while(len(OUT) < 29):
-			OUT.append(BIT_QUEUE.get())
-		RX_QUEUE.put(OUT)
-		OUT = []
 
 def PX(RX_QUEUE, PX_QUEUE):
 	while (True):
@@ -141,12 +139,11 @@ if __name__ == "__main__":
 	try:
 		threads = [
 			threading.Thread(target=IR_RX, args=(BIT_QUEUE,)),
-			threading.Thread(target=RX_BITS, args=(BIT_QUEUE, RX_QUEUE)),
 			threading.Thread(target=PX, args=(RX_QUEUE, PX_QUEUE)),
 			threading.Thread(target=printing, args=(RX_QUEUE, PX_QUEUE)),
 		]
-		for thread in threads:
-			thread.start()
+		threads[0].run()
+		threads[1].start()
 		
 	except KeyboardInterrupt:
 		print("Quiting")
