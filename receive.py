@@ -134,6 +134,7 @@ def play():
 		a_note = PX_QUEUE.get(block=True)
 		note = a_note.note
 		volume = str((a_note.volume/255)*16383)
+		duration = "t"
 		if a_note.duration==50:
 			duration = "t"
 		elif a_note.duration==100:
