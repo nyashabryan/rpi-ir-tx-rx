@@ -67,7 +67,6 @@ def tx(bitstream):
 			pi.write(OUTPUT, 0)
 			while(time.monotonic() - tick < 1/FREQ):
 				pass
-	pi.write(OUTPUT, 0)
 
 def encode(value):
 	lst = []
